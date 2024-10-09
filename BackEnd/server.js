@@ -5,6 +5,9 @@ import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2';
 import bcrypt from 'bcryptjs';
+// Import routes from auth.js
+import authRoutes from './routes/auth.js';
+
 
 const app = express();
 app.use(express.json());
@@ -29,6 +32,8 @@ db.connect(err => {
   }
   console.log('Connected to the MySQL database.');
 });
+
+
 
 // Registration endpoint
 app.post('/api/register', async (req, res) => {

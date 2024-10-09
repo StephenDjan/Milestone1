@@ -45,4 +45,20 @@
       font-size: 16px;
     }
   }
+
+  .login-links {
+    margin-top: 19px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .login-links a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .login-links a:hover {
+    text-decoration: underline;
+  }
+  
   
