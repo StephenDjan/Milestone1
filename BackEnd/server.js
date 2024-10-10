@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
+import { SendMail } from './SendMail.js';
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2';
 import bcrypt from 'bcryptjs';
+import {HashedPassword} from "./helper.js"
 // Import routes from auth.js
 import authRoutes from './routes/auth.js';
 
@@ -63,16 +64,21 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash the password
-    // const hashedPassword = await bcrypt.hash(password, 10);
+     const hashedPassword = HashedPassword(req.body.password);
+
+     const gmailtoken = Math. floor(Math.random() * (999999)) + 1;
+
+//Send verification email
+  SendMail(req.body.email, "Login Verification", gmailtoken)
+
 
     // Insert the user into the database
     // db.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], (err) => {
-    db.query('INSERT INTO Users (email, password, username, phone, city, admin) VALUES (?, ?, ?, ?, ?, ?)', [email, password, username, phone, city, admin], (err) => {
+    db.query('INSERT INTO Users (email, password, username, phone, city, admin) VALUES (?, ?, ?, ?, ?, ?)', [email, hashedPassword, username, phone, city, admin], (err) => {
       if (err) {
         return res.status(500).json({ message: 'Database error during registration' });
       }
-      res.status(201).json({ message: 'User registered successfully' });
+      return res.status(201).json({ message: 'User registered successfully' });
     });
     // INSERT INTO `Users`(`email`, `password`, `username`,`phone`, `city`, `admin`) VALUES ('Test','Test','Test','Test','Test', 0)
   });
@@ -104,10 +110,50 @@ app.post('/api/login', (req, res) => {
     // if (!passwordMatch) {
     //   return res.status(400).json({ message: 'Invalid credentials' });
     // }
+    const gmailtoken = Math. floor(Math.random() * (999999)) + 1;
+
+    //Send verification email
+      SendMail(req.body.email, "Login Verification", gmailtoken)
+
     console.log("Logged in")
-    res.status(200).json({ message: 'Login successful', user: user });
+   return res.status(200).json({ message: 'Login successful', user: user });
   });
 });
+
+
+
+app.post('/api/profile', async (req, res) => {
+  console.log("Trying to update user")
+  const { username, email, phone, city } = req.body;
+  const admin = 0;
+
+  // Check if user already exists
+  db.query('SELECT * FROM Users WHERE email = ?', [email], async (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Database error' });
+    }
+    
+    if (result.length == 0) {
+      return res.status(400).json({ message: 'User does not exits' });
+    }
+  })
+  console.log("2")
+
+
+    // Insert the user into the database
+    // db.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], (err) => {
+      // UPDATE `Users` SET `username`='[value-2]',`phone`='[value-4]',`city`='[value-5] WHERE 1
+    db.query('UPDATE Users SET username = ? , phone = ? , city = ? WHERE email = ?', [username, phone, city, email], (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Database error during registration' });
+      }
+      console.log("success")
+
+      return res.status(200).json({ success: true, message: 'User Info edited successfully' });
+    });
+    console.log("3")
+  });
+
 
 // Starting server
 const PORT = 5000;

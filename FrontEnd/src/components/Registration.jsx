@@ -16,7 +16,7 @@ const Registration = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/api/register", {
-        username, // Sending username
+        username, // Sending username 
         email,
         password,
         phone, // Sending phone

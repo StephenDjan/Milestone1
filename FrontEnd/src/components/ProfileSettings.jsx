@@ -38,7 +38,7 @@ const ProfileSettings = () => {
         setIsSubmitting(true); // Disable submit button
 
         try {
-            const response = await axios.put("http://localhost:5000/api/profile", formData);
+            const response = await axios.post("http://localhost:5000/api/profile", formData);
             if (response.data.success) {
                 setUserInfo(response.data.user); // Update context with the new user info
                 alert("Profile updated successfully");
