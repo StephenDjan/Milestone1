@@ -16,11 +16,11 @@ const AdminLogin = () => {
         password,
       });
 
-      if (response.data.success && response.data.isAdmin) {
-        // Redirect to the admin page if the login is successful
+      if (response.data.user && response.data.user.admin) {
+        // Redirect to the admin page if the user is an admin
         navigate("/admin");
       } else {
-        setError("Invalid email or password");
+        setError("Access denied. You are not an admin.");
       }
     } catch (err) {
       setError("Login failed. Please check your credentials.");

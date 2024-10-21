@@ -8,7 +8,9 @@ const ProfileSettings = () => {
         username: "",
         email: "",
         phone: "",
-        city: ""
+        city: "",
+        password: "",
+        confirmPassword: ""
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +21,9 @@ const ProfileSettings = () => {
                 username: userInfo.username || "",
                 email: userInfo.email || "",
                 phone: userInfo.phone || "",
-                city: userInfo.city || ""
+                city: userInfo.city || "",
+                password: "",
+                confirmPassword: ""
             });
             setIsLoading(false);  // Done loading after userInfo is set
         }
@@ -35,13 +39,21 @@ const ProfileSettings = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true); // Disable submit button
+        setIsSubmitting(true);
+
+        // Check if passwords match
+        if (formData.password && formData.password !== formData.confirmPassword) {
+            alert("Passwords do not match!");
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             const response = await axios.post("http://localhost:5000/api/profile", formData);
             if (response.data.success) {
                 setUserInfo(response.data.user); // Update context with the new user info
                 alert("Profile updated successfully");
+                navigate("/Profile");
             } else {
                 alert("Update failed");
             }
@@ -49,12 +61,12 @@ const ProfileSettings = () => {
             console.error("Error updating profile:", error);
             alert("Failed to update profile");
         } finally {
-            setIsSubmitting(false); // Re-enable the submit button
+            setIsSubmitting(false);
         }
     };
 
     if (isLoading) {
-        return <p>Loading profile...</p>; // Display loading state until data is available
+        return <p>Loading profile...</p>;
     }
 
     return (
@@ -96,6 +108,24 @@ const ProfileSettings = () => {
                         type="text"
                         name="city"
                         value={formData.city}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <label>New Password:</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <label>Confirm Password:</label>
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
                         onChange={handleChange}
                     />
                 </div>

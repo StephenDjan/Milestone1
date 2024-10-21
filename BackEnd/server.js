@@ -6,6 +6,7 @@ import cors from 'cors';
 import mysql from 'mysql2';
 import bcrypt from 'bcryptjs';
 import {HashedPassword} from "./helper.js"
+import passwordReset from './routes/passwordReset.js';
 // Import routes from auth.js
 import authRoutes from './routes/auth.js';
 
@@ -37,50 +38,36 @@ db.connect(err => {
 
 
 // Registration endpoint
+// Registration endpoint
 app.post('/api/register', async (req, res) => {
   const { username, email, password, phone, city } = req.body;
   const admin = 0;
-  console.log("username")
-  console.log(username)
-  console.log("email")
-  console.log(email)
-  console.log("password")
-  console.log(password)
-  console.log("phone")
-  console.log(phone)
-  console.log("city")
-  console.log(city)
-
-  console.log("typeof phone")
-  console.log(typeof phone)
 
   // Check if user already exists
   db.query('SELECT * FROM Users WHERE email = ?', [email], async (err, result) => {
     if (err) {
       return res.status(500).json({ message: 'Database error' });
     }
-    
+
     if (result.length > 0) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-     const hashedPassword = HashedPassword(req.body.password);
+    const hashedPassword = HashedPassword(password);
+    const gmailtoken = Math.floor(Math.random() * 999999) + 1;
+    const otpCreatedAt = new Date();
 
-     const gmailtoken = Math. floor(Math.random() * (999999)) + 1;
+    // Send verification email
+    SendMail(email, "Login Verification", gmailtoken);
 
-//Send verification email
-  SendMail(req.body.email, "Login Verification", gmailtoken)
-
-
-    // Insert the user into the database
-    // db.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], (err) => {
-    db.query('INSERT INTO Users (email, password, username, phone, city, admin) VALUES (?, ?, ?, ?, ?, ?)', [email, hashedPassword, username, phone, city, admin], (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Database error during registration' });
-      }
-      return res.status(201).json({ message: 'User registered successfully' });
+    // Insert the user into the database with otp and otp_created_at
+    db.query('INSERT INTO Users (email, password, username, phone, city, admin, otp, otp_created_at, is_verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)', 
+      [email, hashedPassword, username, phone, city, admin, gmailtoken, otpCreatedAt], (err) => {
+        if (err) {
+          return res.status(500).json({ message: 'Database error during registration' });
+        }
+        return res.status(201).json({ message: 'User registered successfully, please verify your OTP' });
     });
-    // INSERT INTO `Users`(`email`, `password`, `username`,`phone`, `city`, `admin`) VALUES ('Test','Test','Test','Test','Test', 0)
   });
 });
 
@@ -116,6 +103,12 @@ app.post('/api/login', (req, res) => {
       SendMail(req.body.email, "Login Verification", gmailtoken)
 
     console.log("Logged in")
+    const otpCreatedAt = new Date();
+    db.query('UPDATE Users SET otp = ?, otp_created_at = ? WHERE email = ?', [gmailtoken, otpCreatedAt, email], (err) => {
+      if (err) {
+        console.error('Error updating user as verified:', err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }})
    return res.status(200).json({ message: 'Login successful', user: user });
   });
 });
@@ -154,6 +147,62 @@ app.post('/api/profile', async (req, res) => {
     console.log("3")
   });
 
+
+app.post('/verify-otp', (req, res) => {
+  let { email, otpCode } = req.body;
+
+  // Query the database for the OTP associated with the email
+  db.query('SELECT otp, otp_created_at FROM Users WHERE email = ?', [email], (err, result) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+
+    if (result.length === 0) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    const { otp, otp_created_at } = result[0];
+
+    // Check if the OTP has expired
+    const now = new Date();
+    const otpExpirationTime = new Date(otp_created_at);
+    otpExpirationTime.setMinutes(otpExpirationTime.getMinutes() + 5); // Assuming OTP valid for 5 minutes
+
+    if (now > otpExpirationTime) {
+      return res.status(400).json({ message: 'OTP has expired' });
+    }
+    console.log("otpCode")
+    console.log(otpCode)
+    console.log("type of otpCode")
+    console.log(typeof otpCode)
+    console.log("otp")
+    console.log(otp)
+    console.log("typeof otp")
+    console.log(typeof otp)
+    otpCode = parseInt(otpCode)
+    console.log("otpCode")
+    console.log(otpCode)
+    console.log("type of otpCode")
+    console.log(typeof otpCode)
+
+    if (otpCode !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    // OTP is valid, update user as verified and clear OTP
+    db.query('UPDATE Users SET otp = NULL, otp_created_at = NULL, is_verified = 1 WHERE email = ?', [email], (err) => {
+      if (err) {
+        console.error('Error updating user as verified:', err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+
+      return res.status(200).json({ message: 'OTP verified successfully, user is now verified.' });
+    });
+  });
+});
+
+app.use('/api', passwordReset);
 
 // Starting server
 const PORT = 5000;

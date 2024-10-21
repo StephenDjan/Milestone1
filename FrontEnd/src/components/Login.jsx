@@ -10,7 +10,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { userInfo, setUserInfo } = useContext(UserContext);
+  const { userInfo, setUserInfo, userEmail, setuserEmail } = useContext(UserContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,7 +18,8 @@ const Login = () => {
       const response = await axios.post("http://localhost:5000/api/login", { email, password });
       alert(response.data.message);
       setUserInfo(response.data.user);
-      navigate("/profile");
+      setuserEmail(email)
+      navigate("/Verify-otp");
     } catch (error) {
       setError(error.response?.data?.message || "An error occurred");
     }

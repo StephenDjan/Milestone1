@@ -22,7 +22,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/verify-otp" element={<Verify-otp />} />  {/* Add the VerifyOTP route */}
+                <Route path="/verify-otp" element={<VerifyOTP />} />  {/* Add the VerifyOTP route */}
             </Routes>
         </BrowserRouter>
       </UserContextprovider>

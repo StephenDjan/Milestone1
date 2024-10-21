@@ -1,21 +1,20 @@
-import React, { useState } from "react";
-import axios from "axios";
-import './forgotPassword.css'; // Import your CSS file
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [phone, setPhone] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/forgot-password", { email });
+      const response = await axios.post('http://localhost:5000/api/forgot-password', { phone });
       setMessage(response.data.message);
-      setError(""); // Clear error if successful
+      setError('');
     } catch (error) {
-      setError(error.response?.data?.message || "An error occurred");
-      setMessage(""); // Clear message if error
+      setError(error.response?.data?.message || 'An error occurred');
+      setMessage('');
     }
   };
 
@@ -24,14 +23,13 @@ const ForgotPassword = () => {
       <form onSubmit={handleForgotPassword}>
         <h2>Reset Password</h2>
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
+          type="text"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Enter your phone number"
           required
         />
-        <button type="submit">Send Reset Link</button>
-
+        <button type="submit">Submit</button>
         {message && <p style={{ color: 'green' }}>{message}</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>

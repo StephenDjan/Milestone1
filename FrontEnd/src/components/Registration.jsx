@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import UserContext from "./providers/UserContext";
 
 const Registration = () => {
-  const [username, setUsername] = useState(""); // Added username state
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState(""); // Added phone state
-  const [city, setCity] = useState(""); // Added city state
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -16,19 +17,21 @@ const Registration = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/api/register", {
-        username, // Sending username 
+        username,
         email,
         password,
-        phone, // Sending phone
-        city, // Sending city
+        phone,
+        city,
       });
-      console.log("Success")
-      setMessage(response.data.message);
-      alert(message)
-      navigate("/");
-      setError("");
+
+      console.log("Registration Success:", response.data.message);
+      alert(response.data.message); // Use response directly
+      
+      // Navigate to the verify OTP page with email
+      navigate("/verify-otp", { state: { email } });
+      setError(""); // Clear any previous error
     } catch (error) {
-        console.log("Error")
+      console.error("Registration error:", error); // Log the actual error
       setError(error.response?.data?.message || "An error occurred");
       setMessage("");
     }
