@@ -9,7 +9,9 @@ import {HashedPassword} from "./helper.js"
 import passwordReset from './routes/passwordReset.js';
 // Import routes from auth.js
 import authRoutes from './routes/auth.js';
-
+//import advisingRoutes from './routes/advising.js';
+import advisingRoutes from './routes/advisingRoutes.js'; 
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 app.use(express.json());
@@ -35,9 +37,14 @@ db.connect(err => {
   console.log('Connected to the MySQL database.');
 });
 
+app.use("/api", authRoutes)
 
+// Advising History endpoint
+app.use('/api/advising', advisingRoutes);
 
-// Registration endpoint
+//adminRoutes endpoint
+app.use('/admin', adminRoutes);
+
 // Registration endpoint
 app.post('/api/register', async (req, res) => {
   const { username, email, password, phone, city } = req.body;
@@ -113,8 +120,6 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-
-
 app.post('/api/profile', async (req, res) => {
   console.log("Trying to update user")
   const { username, email, phone, city } = req.body;
@@ -148,6 +153,7 @@ app.post('/api/profile', async (req, res) => {
   });
 
 
+  
 app.post('/verify-otp', (req, res) => {
   let { email, otpCode } = req.body;
 
@@ -203,6 +209,7 @@ app.post('/verify-otp', (req, res) => {
 });
 
 app.use('/api', passwordReset);
+
 
 // Starting server
 const PORT = 5000;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import UserContext from "./providers/UserContext";
+import { UserContext } from './providers/UserContext';
 
 const ProfileSettings = () => {
     const { userInfo, setUserInfo } = useContext(UserContext);

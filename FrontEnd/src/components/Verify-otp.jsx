@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import UserContext from "./providers/UserContext";
+import { UserContext } from './providers/UserContext';
+
 
 const VerifyOTP = () => {
   const location = useLocation();

@@ -5,27 +5,43 @@ import Registration from './components/Registration';
 import Profile from './components/Profile';
 import ProfileSettings from './components/ProfileSettings';
 import ForgotPassword from './components/ForgotPassword';
+import PasswordReset from './components/PasswordReset';
 import VerifyOTP from './components/Verify-otp';
-import AdminPage from './components/AdminPage'; // Import the new admin page
-import AdminLogin from './components/AdminLogin'; // Import the new admin login page
-import { UserContextprovider } from './components/providers/UserContext';
+import AdminPage from './components/AdminPage'; 
+import AdminLogin from './components/AdminLogin';
+import Advising from './components/AdvisingHistory'; // Import the new Advising page
+import AdvisingHistory from './components/AdvisingHistory';  // Import the AdvisingHistory component
+import CoursePlans from './components/CoursePlans';          // Import the CoursePlans component
+import Navbar from './components/Navbar';
+import AdvisingEntry from './components/AdvisingEntry';
+import AdminDashboard from './components/AdminDashboard';
+import PrerequisiteForm from './components/PrerequisiteForm';
+import { UserContextProvider } from './components/providers/UserContext';
 
 function App() {
     return (
-      <UserContextprovider>
+      <UserContextProvider>
         <BrowserRouter>
+          <Navbar />
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/Registration" element={<Registration />} />
-                <Route path="/Profile" element={<Profile />} />
+                <Route path="/registration" element={<Registration />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/update-profile" element={<ProfileSettings />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<PasswordReset />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/verify-otp" element={<VerifyOTP />} />  {/* Add the VerifyOTP route */}
+                <Route path="/verify-otp" element={<VerifyOTP />} />
+                <Route path="/advising" element={<Advising />} />
+                <Route path="/advising-history" element={<AdvisingHistory />} />
+                <Route path="/course-plans" element={<CoursePlans />} />
+                <Route path="/advising-entry" element={<AdvisingEntry />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/prerequisites" element={<PrerequisiteForm />} />
             </Routes>
         </BrowserRouter>
-      </UserContextprovider>
+      </UserContextProvider>
     );
 }
 

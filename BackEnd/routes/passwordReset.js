@@ -1,5 +1,6 @@
 import express from 'express';
 import mysql from 'mysql2';
+import { HashedPassword } from '../helper.js'; // Import your helper function
 
 const router = express.Router();
 const db = mysql.createConnection({ host: 'localhost', user: 'root', password: '', database: 'StevDB' });
@@ -20,17 +21,24 @@ router.post('/forgot-password', (req, res) => {
 });
 
 // Reset Password - Update Password
-router.post('/reset-password', (req, res) => {
+router.post('/reset-password', async (req, res) => {
   const { phone, password } = req.body;
-  const hashedPassword = hashPassword(password);  // Assuming you have a password hashing function
 
-  db.query('UPDATE Users SET password = ? WHERE phone = ?', [hashedPassword, phone], (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Error updating password' });
-    }
-    res.status(200).json({ message: 'Password updated successfully' });
-  });
+  try {
+    // Hash the new password using the helper function
+    const hashedPassword = HashedPassword(password);
+
+    db.query('UPDATE Users SET password = ? WHERE phone = ?', [hashedPassword, phone], (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Error updating password' });
+      }
+      res.status(200).json({ message: 'Password updated successfully' });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error hashing password' });
+  }
 });
 
 export default router;

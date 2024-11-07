@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import UserContext from "./providers/UserContext";
+import { UserContext } from './providers/UserContext';
 
 const Registration = () => {
   const [username, setUsername] = useState("");

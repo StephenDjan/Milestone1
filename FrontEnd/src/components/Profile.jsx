@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import UserContext from "./providers/UserContext";
+import { UserContext } from './providers/UserContext';
+
 import './profile.css'; // Import the CSS file
 
 const Profile = () => {

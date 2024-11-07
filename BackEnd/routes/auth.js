@@ -14,7 +14,6 @@ const db = mysql.createConnection({
 });
 
 // Registration endpoint
-// Registration endpoint
 router.post('/register', async (req, res) => {
   const { username, email, password, phone, city } = req.body;
   const admin = 0; // Regular user, not an admin
@@ -76,7 +75,7 @@ router.post('/admin/login', (req, res) => {
     const user = result[0];
 
     // Check if the user is an admin
-    if (!user.admin) {
+    if (user.admin !== 1) {
       return res.status(403).json({ message: 'Access denied. You are not an admin.' });
     }
 
@@ -87,7 +86,17 @@ router.post('/admin/login', (req, res) => {
     }
 
     // Admin login successful
-    res.status(200).json({ message: 'Admin login successful', user: user });
+    res.status(200).json({ message: 'Admin login successful', user });
+  });
+});
+
+// Endpoint to fetch all user emails (admin-only route)
+router.get('/admin/users', (req, res) => {
+  db.query('SELECT email FROM Users', (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Database error' });
+    }
+    return res.status(200).json({ users: result });
   });
 });
 
